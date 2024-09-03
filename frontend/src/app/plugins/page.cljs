@@ -115,7 +115,7 @@
 
       :else
       (let [page (u/proxy->page self)]
-        (dm/get-in page [:options :plugin-data (keyword "plugin" (str $plugin)) key]))))
+        (dm/get-in page [:plugin-data (keyword "plugin" (str $plugin)) key]))))
 
   (setPluginData
     [_ key value]
@@ -135,7 +135,7 @@
   (getPluginDataKeys
     [self]
     (let [page (u/proxy->page self)]
-      (apply array (keys (dm/get-in page [:options :plugin-data (keyword "plugin" (str $plugin))])))))
+      (apply array (keys (dm/get-in page [:plugin-data (keyword "plugin" (str $plugin))])))))
 
   (getSharedPluginData
     [self namespace key]
@@ -148,7 +148,7 @@
 
       :else
       (let [page (u/proxy->page self)]
-        (dm/get-in page [:options :plugin-data (keyword "shared" namespace) key]))))
+        (dm/get-in page [:plugin-data (keyword "shared" namespace) key]))))
 
   (setSharedPluginData
     [_ namespace key value]
@@ -177,7 +177,7 @@
 
       :else
       (let [page (u/proxy->page self)]
-        (apply array (keys (dm/get-in page [:options :plugin-data (keyword "shared" namespace)]))))))
+        (apply array (keys (dm/get-in page [:plugin-data (keyword "shared" namespace)]))))))
 
   (openPage
     [_]
@@ -250,7 +250,7 @@
 
    {:name "background"
     :enumerable false
-    :get #(or (-> % u/proxy->page :options :background) cc/canvas)
+    :get #(or (-> % u/proxy->page :background) cc/canvas)
     :set
     (fn [_ value]
       (cond
@@ -266,5 +266,5 @@
    {:name "flows"
     :get
     (fn [self]
-      (let [flows (d/nilv (-> (u/proxy->page self) :options :flows) [])]
+      (let [flows (d/nilv (-> (u/proxy->page self) :flows) [])]
         (format/format-array #(flow-proxy plugin-id file-id id (:id %)) flows)))}))
