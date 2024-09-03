@@ -49,24 +49,21 @@
 (defn- login-with-oidc
   [event provider params]
   (dom/prevent-default event)
-  (let [params (-> params
-                   (assoc :provider provider)
-                   (assoc :create-welcome-file (cf/external-feature-flag "onboarding-03" "test")))]
-    (->> (rp/cmd! :login-with-oidc params)
-         (rx/subs! (fn [{:keys [redirect-uri] :as rsp}]
-                     (if redirect-uri
-                       (.replace js/location redirect-uri)
-                       (log/error :hint "unexpected response from OIDC method"
-                                  :resp (pr-str rsp))))
-                   (fn [cause]
-                     (let [{:keys [type code] :as error} (ex-data cause)]
-                       (cond
-                         (and (= type :restriction)
-                              (= code :provider-not-configured))
-                         (st/emit! (msg/error (tr "errors.auth-provider-not-configured")))
+  (->> (rp/cmd! :login-with-oidc (assoc params :provider provider))
+       (rx/subs! (fn [{:keys [redirect-uri] :as rsp}]
+                   (if redirect-uri
+                     (.replace js/location redirect-uri)
+                     (log/error :hint "unexpected response from OIDC method"
+                                :resp (pr-str rsp))))
+                 (fn [cause]
+                   (let [{:keys [type code] :as error} (ex-data cause)]
+                     (cond
+                       (and (= type :restriction)
+                            (= code :provider-not-configured))
+                       (st/emit! (msg/error (tr "errors.auth-provider-not-configured")))
 
-                         :else
-                         (st/emit! (msg/error (tr "errors.generic"))))))))))
+                       :else
+                       (st/emit! (msg/error (tr "errors.generic")))))))))
 
 (s/def ::email ::us/email)
 (s/def ::password ::us/not-empty-string)

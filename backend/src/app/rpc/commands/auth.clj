@@ -389,7 +389,7 @@
         (fn []
           (when (:create-welcome-file params)
             (let [cfg (dissoc cfg ::db/conn)]
-              (wrk/submit! executor (partial create-welcome-file cfg profile)))))]
+              (wrk/submit! executor (create-welcome-file cfg profile)))))]
 
     (cond
       ;; When profile is blocked, we just ignore it and return plain data
