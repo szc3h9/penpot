@@ -242,6 +242,8 @@
           (v/-block "Schema" (v/-visit schema printer) printer)]})
 
 (defn pretty-explain
+  "A helper that allows print a console-friendly output for the
+  explain; should not be used for other purposes"
   [explain & {:keys [variant message]
               :or {variant ::explain
                    message "Validation Error"}}]
@@ -259,6 +261,7 @@
   ([s] (lookup sr/default-registry s))
   ([registry s] (schema (mr/schema registry s))))
 
+
 (defn fast-check!
   "A fast path for checking process, assumes the ILazySchema protocol
   implemented on the provided `s` schema. Sould not be used directly."
@@ -274,6 +277,7 @@
 
 (declare define)
 
+;; DEPRECATED: should not be used for new code
 (defn check-fn
   "Create a predefined check function"
   [s]
