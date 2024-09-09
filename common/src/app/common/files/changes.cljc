@@ -115,6 +115,35 @@
                                  change))))]
     [:schema {:gen/gen gen} schema]))
 
+
+(def schema:set-plugin-data-change
+  (let [types  #{:file :page :shape :color :typography :component}
+
+        schema [:map {:title "SetPagePluginData"}
+                [:type [:= :set-plugin-data]]
+                [:object-type [::sm/one-of types]]
+                ;; It's optional because files don't need the id for type :file
+                [:object-id {:optional true} ::sm/uuid]
+                [:page-id {:optional true} ::sm/uuid]
+                [:namespace {:gen/gen (sg/word-keyword)} :keyword]
+                [:key {:gen/gen (sg/word-string)} :string]
+                [:value [:maybe [:string {:gen/gen (sg/word-string)}]]]]
+
+        check1 [:fn {:error/path [:page-id]
+                     :error/message "missing page-id"}
+                (fn [change]
+                  (if (= :shape (:type change))
+                    (uuid? (:page-id change))
+                    true))]
+
+        gen    (->> (sg/generator schema)
+                    (sg/fmap (fn [change]
+                               (if (= :shape (:type change))
+                                 (assoc change :page-id (uuid/next))
+                                 (dissoc change :page-id)))))]
+
+    [:and {:gen/gen gen} schema check1]))
+
 (def schema:change
   [:schema
    [:multi {:dispatch :type
@@ -219,17 +248,7 @@
       [:background :string]
       [:name :string]]]
 
-    [:mod-plugin-data
-     [:map {:title "ModPagePluginData"}
-      [:type [:= :mod-plugin-data]]
-      [:object-type [::sm/one-of #{:file :page :shape :color :typography :component}]]
-      ;; It's optional because files don't need the id for type :file
-      [:object-id {:optional true} [:maybe ::sm/uuid]]
-      ;; Only needed in type shape
-      [:page-id {:optional true} [:maybe ::sm/uuid]]
-      [:namespace :keyword]
-      [:key :string]
-      [:value [:maybe :string]]]]
+    [:set-plugin-data schema:set-plugin-data-change]
 
     [:del-page
      [:map {:title "DelPageChange"}
@@ -733,7 +752,7 @@
                         :always
                         (d/without-nils)))))
 
-(defmethod process-change :mod-plugin-data
+(defmethod process-change :set-plugin-data
   [data {:keys [object-type object-id page-id namespace key value]}]
 
   (when (and (= object-type :shape) (nil? page-id))

@@ -21,9 +21,10 @@
    [app.util.object :as obj]
    [rumext.v2 :as mf]))
 
-(mf/defc palette-item
-  {::mf/wrap [mf/memo]}
-  [{:keys [color size]}]
+(mf/defc palette-item*
+  {::mf/wrap [mf/memo]
+   ::mf/props :obj}
+  [{:keys [color size on-click]  :rest other}]
   (letfn [(select-color [event]
             (st/emit!
              (dwl/add-recent-color color)
@@ -35,6 +36,8 @@
            :on-click select-color}
      [:& cb/color-bullet {:color color}]
      [:& cb/color-name {:color color :size size :origin :palette}]]))
+
+[:> palette-item {:on-click ...}]
 
 
 (mf/defc palette

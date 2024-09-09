@@ -214,11 +214,11 @@
          (update :undo-changes conj undo)
          (apply-changes-local)))))
 
-(defn mod-plugin-data
+(defn set-plugin-data
   ([changes namespace key value]
-   (mod-plugin-data changes :file nil nil namespace key value))
+   (set-plugin-data changes :file nil nil namespace key value))
   ([changes type id namespace key value]
-   (mod-plugin-data changes type id nil namespace key value))
+   (set-plugin-data changes type id nil namespace key value))
   ([changes type id page-id namespace key value]
    (let [data (::file-data (meta changes))
          old-val
@@ -241,8 +241,8 @@
            :component
            (get-in data [:components id :plugin-data namespace key]))]
      (-> changes
-         (update :redo-changes conj {:type :mod-plugin-data :object-type type :object-id id :page-id page-id :namespace namespace :key key :value value})
-         (update :undo-changes conj {:type :mod-plugin-data :object-type type :object-id id :page-id page-id :namespace namespace :key key :value old-val})
+         (update :redo-changes conj {:type :set-plugin-data :object-type type :object-id id :page-id page-id :namespace namespace :key key :value value})
+         (update :undo-changes conj {:type :set-plugin-data :object-type type :object-id id :page-id page-id :namespace namespace :key key :value old-val})
          (apply-changes-local)))))
 
 (defn del-page
