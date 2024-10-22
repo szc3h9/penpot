@@ -250,6 +250,8 @@
       ;; The commit event is responsible to apply the data localy
       ;; and update the persistence internal state with the updated
       ;; file-revn
+
+      ;; ->> Aqui es donde se hace el commit del evento que llega remoto
       (rx/of (dch/commit {:file-id file-id
                           :file-revn revn
                           :save-undo? false

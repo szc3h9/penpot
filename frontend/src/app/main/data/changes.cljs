@@ -108,6 +108,7 @@
   [{:keys [commit-id redo-changes undo-changes origin save-undo? features
            file-id file-revn undo-group tags stack-undo? source]}]
 
+  (.log js/console (clj->js redo-changes))
   (dm/assert!
    "expect valid vector of changes for redo-changes"
    (cpc/check-changes! redo-changes))

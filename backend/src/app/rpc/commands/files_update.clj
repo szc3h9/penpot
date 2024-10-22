@@ -414,6 +414,7 @@
                         (not skip-validate))
                (get-file-libraries cfg file))
 
+        ;; ->> UPDTE REVN. Lo que hay que mirar aqui que cuando llega el vern y no matchea hay que rechazarlo
         file (-> (files/check-version! file)
                  (update :revn inc)
                  (update :data cpc/process-changes changes)
